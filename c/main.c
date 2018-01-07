@@ -102,7 +102,7 @@ struct Position aiTurn(const char board[BOARD_SIZE][BOARD_SIZE], int me, int oth
     int i, j;
     struct Position preferedPos = {0, 0};
 
-    for (i = 0; i < BOARD_SIZE; i++)
+    for (i = 0; i < BOARD_SIZE; i++) {
         for (j = 0; j < BOARD_SIZE; j++) {
             if (EMPTY == board[i][j]) {
                 preferedPos.x = i;
@@ -110,7 +110,7 @@ struct Position aiTurn(const char board[BOARD_SIZE][BOARD_SIZE], int me, int oth
                 return preferedPos;
             }
         }
-
+    }
 
     return preferedPos;
 }
@@ -155,30 +155,25 @@ void loop() {
 
         if (strstr(buffer, START)) {
             start();
-        }
-        else if (strstr(buffer, PLACE)) {
+        } else if (strstr(buffer, PLACE)) {
             char tmp[MAX_BYTE] = {0};
             int x, y, z;
             sscanf(buffer, "%s %d %d %d", tmp, &x, &y, &z);
             place(x, y, z);
-        }
-        else if (strstr(buffer, DONE)) {
+        } else if (strstr(buffer, DONE)) {
             done();
-        }
-        else if (strstr(buffer, BEGIN)) {
+        } else if (strstr(buffer, BEGIN)) {
             // AI
             struct Position pos = aiBegin((const char (*)[BOARD_SIZE]) board, ME);
             board[pos.x][pos.y] = ME;
             printf("%d %d\n", pos.x, pos.y);
             fflush(stdout);
-        }
-        else if (strstr(buffer, TURN)) {
+        } else if (strstr(buffer, TURN)) {
             char tmp[MAX_BYTE] = {0};
             int x, y;
             sscanf(buffer, "%s %d %d", tmp, &x, &y);
             turn(x, y);
-        }
-        else if (strstr(buffer, END)) {
+        } else if (strstr(buffer, END)) {
             char tmp[MAX_BYTE] = {0};
             int x;
             sscanf(buffer, "%s %d", tmp, &x);
