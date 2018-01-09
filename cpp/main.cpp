@@ -23,7 +23,7 @@ struct Position {
 };
 
 ostream &operator<<(ostream &out, const Position &pos) {
-    out << pos.x << " " << pos.y;
+    return out << pos.x << " " << pos.y;
 }
 
 class AI {
