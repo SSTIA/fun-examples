@@ -25,7 +25,7 @@ struct Position {
 };
 
 char buffer[MAX_BYTE] = {0};
-char board[BOARD_SIZE][BOARD_SIZE] = {0};
+int board[BOARD_SIZE][BOARD_SIZE] = {0};
 
 void debug(const char *str) {
     printf("DEBUG %s\n", str);
