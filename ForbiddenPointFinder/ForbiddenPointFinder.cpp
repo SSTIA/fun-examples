@@ -12,66 +12,66 @@
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-CForbiddenPointFinder::CForbiddenPointFinder() {
-    Clear();
+ForbiddenPointFinder::ForbiddenPointFinder() {
+    clear();
 }
 
-CForbiddenPointFinder::~CForbiddenPointFinder() {
+ForbiddenPointFinder::~ForbiddenPointFinder() {
 }
 
 //////////////////////////////////////////////////////////////////////
 // Implementation
 //////////////////////////////////////////////////////////////////////
 
-void CForbiddenPointFinder::Clear() {
+void ForbiddenPointFinder::clear() {
     nForbiddenPoints = 0;
 
-    for (int i = 0; i < BOARD_SIZE + 2; i++) {
-        cBoard[0][i] = '$';
-        cBoard[(BOARD_SIZE + 1)][i] = '$';
-        cBoard[i][0] = '$';
-        cBoard[i][(BOARD_SIZE + 1)] = '$';
+    for (int i = 0; i < BoardSize + 2; i++) {
+        cBoard[0][i] = Stone ::Wall;
+        cBoard[(BoardSize + 1)][i] = Stone ::Wall;
+        cBoard[i][0] = Stone ::Wall;
+        cBoard[i][(BoardSize + 1)] = Stone ::Wall;
     }
 
-    for (int i = 1; i <= BOARD_SIZE; i++)
-        for (int j = 1; j <= BOARD_SIZE; j++)
-            cBoard[i][j] = EMPTY_STONE;
+    for (int i = 1; i <= BoardSize; i++)
+        for (int j = 1; j <= BoardSize; j++)
+            cBoard[i][j] = Stone::Empty;
 }
 
-int CForbiddenPointFinder::AddStone(int x, int y, char cStone) {
-    int nResult = -1;
+ForbiddenPointFinder::Result ForbiddenPointFinder::addStone(int x, int y, Stone cStone) {
+    Result nResult = Result::UNKNOWN;
 
-    if (cStone == BLACK_STONE) {
-        if (IsFive(x, y, 0))
-            nResult = BLACK_FIVE;
+    if (cStone == Stone::Black) {
+        if (isFive(x, y, 0))
+            nResult = Result::BlackWin;
         for (int i = 0; i < nForbiddenPoints; i++) {
             if (ptForbidden[i] == CPoint(x, y))
-                nResult = BLACK_FORBIDDEN;
+                nResult = Result::Forbidden;
         }
-    } else if (cStone == WHITE_STONE) {
-        if (IsFive(x, y, 1))
-            nResult = WHITE_FIVE;
+    } else if (cStone == Stone::White) {
+        if (isFive(x, y, 1))
+            nResult = Result::WhiteWin;
     }
 
     cBoard[x + 1][y + 1] = cStone;
-    if (nResult == -1)
-        FindForbiddenPoints();
+    if (nResult == Result::UNKNOWN)
+        findForbiddenPoints();
     else
         nForbiddenPoints = 0;
     return nResult;
 }
 
-void CForbiddenPointFinder::SetStone(int x, int y, char cStone) {
+void ForbiddenPointFinder::setStone(int x, int y, Stone cStone) {
     cBoard[x + 1][y + 1] = cStone;
 }
 
-bool CForbiddenPointFinder::IsFive(int x, int y, int nColor) {
-    if (cBoard[x + 1][y + 1] != EMPTY_STONE)
+bool ForbiddenPointFinder::isFive(int x, int y, int nColor) {
+    if (cBoard[x + 1][y + 1] != Stone::Empty)
         return false;
 
     if (nColor == 0)    // black
     {
-        SetStone(x, y, BLACK_STONE);
+        setStone(x, y, Stone::Black);
 
         // detect black five
         int i, j;
@@ -80,20 +80,20 @@ bool CForbiddenPointFinder::IsFive(int x, int y, int nColor) {
         int nLine = 1;
         i = x;
         while (i > 0) {
-            if (cBoard[i--][y + 1] == BLACK_STONE)
+            if (cBoard[i--][y + 1] == Stone::Black)
                 nLine++;
             else
                 break;
         }
         i = x + 2;
-        while (i < (BOARD_SIZE + 1)) {
-            if (cBoard[i++][y + 1] == BLACK_STONE)
+        while (i < (BoardSize + 1)) {
+            if (cBoard[i++][y + 1] == Stone::Black)
                 nLine++;
             else
                 break;
         }
         if (nLine == 5) {
-            SetStone(x, y, EMPTY_STONE);
+            setStone(x, y, Stone::Empty);
             return true;
         }
 
@@ -101,20 +101,20 @@ bool CForbiddenPointFinder::IsFive(int x, int y, int nColor) {
         nLine = 1;
         i = y;
         while (i > 0) {
-            if (cBoard[x + 1][i--] == BLACK_STONE)
+            if (cBoard[x + 1][i--] == Stone::Black)
                 nLine++;
             else
                 break;
         }
         i = y + 2;
-        while (i < (BOARD_SIZE + 1)) {
-            if (cBoard[x + 1][i++] == BLACK_STONE)
+        while (i < (BoardSize + 1)) {
+            if (cBoard[x + 1][i++] == Stone::Black)
                 nLine++;
             else
                 break;
         }
         if (nLine == 5) {
-            SetStone(x, y, EMPTY_STONE);
+            setStone(x, y, Stone::Empty);
             return true;
         }
 
@@ -123,21 +123,21 @@ bool CForbiddenPointFinder::IsFive(int x, int y, int nColor) {
         i = x;
         j = y;
         while ((i > 0) && (j > 0)) {
-            if (cBoard[i--][j--] == BLACK_STONE)
+            if (cBoard[i--][j--] == Stone::Black)
                 nLine++;
             else
                 break;
         }
         i = x + 2;
         j = y + 2;
-        while ((i < (BOARD_SIZE + 1)) && (j < (BOARD_SIZE + 1))) {
-            if (cBoard[i++][j++] == BLACK_STONE)
+        while ((i < (BoardSize + 1)) && (j < (BoardSize + 1))) {
+            if (cBoard[i++][j++] == Stone::Black)
                 nLine++;
             else
                 break;
         }
         if (nLine == 5) {
-            SetStone(x, y, EMPTY_STONE);
+            setStone(x, y, Stone::Empty);
             return true;
         }
 
@@ -145,30 +145,30 @@ bool CForbiddenPointFinder::IsFive(int x, int y, int nColor) {
         nLine = 1;
         i = x;
         j = y + 2;
-        while ((i > 0) && (j < (BOARD_SIZE + 1))) {
-            if (cBoard[i--][j++] == BLACK_STONE)
+        while ((i > 0) && (j < (BoardSize + 1))) {
+            if (cBoard[i--][j++] == Stone::Black)
                 nLine++;
             else
                 break;
         }
         i = x + 2;
         j = y;
-        while ((i < (BOARD_SIZE + 1)) && (j > 0)) {
-            if (cBoard[i++][j--] == BLACK_STONE)
+        while ((i < (BoardSize + 1)) && (j > 0)) {
+            if (cBoard[i++][j--] == Stone::Black)
                 nLine++;
             else
                 break;
         }
         if (nLine == 5) {
-            SetStone(x, y, EMPTY_STONE);
+            setStone(x, y, Stone::Empty);
             return true;
         }
 
-        SetStone(x, y, EMPTY_STONE);
+        setStone(x, y, Stone::Empty);
         return false;
     } else if (nColor == 1)    // white
     {
-        SetStone(x, y, WHITE_STONE);
+        setStone(x, y, Stone::White);
 
         // detect white five or more
         int i, j;
@@ -177,20 +177,20 @@ bool CForbiddenPointFinder::IsFive(int x, int y, int nColor) {
         int nLine = 1;
         i = x;
         while (i > 0) {
-            if (cBoard[i--][y + 1] == WHITE_STONE)
+            if (cBoard[i--][y + 1] == Stone::White)
                 nLine++;
             else
                 break;
         }
         i = x + 2;
-        while (i < (BOARD_SIZE + 1)) {
-            if (cBoard[i++][y + 1] == WHITE_STONE)
+        while (i < (BoardSize + 1)) {
+            if (cBoard[i++][y + 1] == Stone::White)
                 nLine++;
             else
                 break;
         }
         if (nLine >= 5) {
-            SetStone(x, y, EMPTY_STONE);
+            setStone(x, y, Stone::Empty);
             return true;
         }
 
@@ -198,20 +198,20 @@ bool CForbiddenPointFinder::IsFive(int x, int y, int nColor) {
         nLine = 1;
         i = y;
         while (i > 0) {
-            if (cBoard[x + 1][i--] == WHITE_STONE)
+            if (cBoard[x + 1][i--] == Stone::White)
                 nLine++;
             else
                 break;
         }
         i = y + 2;
-        while (i < (BOARD_SIZE + 1)) {
-            if (cBoard[x + 1][i++] == WHITE_STONE)
+        while (i < (BoardSize + 1)) {
+            if (cBoard[x + 1][i++] == Stone::White)
                 nLine++;
             else
                 break;
         }
         if (nLine >= 5) {
-            SetStone(x, y, EMPTY_STONE);
+            setStone(x, y, Stone::Empty);
             return true;
         }
 
@@ -220,21 +220,21 @@ bool CForbiddenPointFinder::IsFive(int x, int y, int nColor) {
         i = x;
         j = y;
         while ((i > 0) && (j > 0)) {
-            if (cBoard[i--][j--] == WHITE_STONE)
+            if (cBoard[i--][j--] == Stone::White)
                 nLine++;
             else
                 break;
         }
         i = x + 2;
         j = y + 2;
-        while ((i < (BOARD_SIZE + 1)) && (j < (BOARD_SIZE + 1))) {
-            if (cBoard[i++][j++] == WHITE_STONE)
+        while ((i < (BoardSize + 1)) && (j < (BoardSize + 1))) {
+            if (cBoard[i++][j++] == Stone::White)
                 nLine++;
             else
                 break;
         }
         if (nLine >= 5) {
-            SetStone(x, y, EMPTY_STONE);
+            setStone(x, y, Stone::Empty);
             return true;
         }
 
@@ -242,36 +242,36 @@ bool CForbiddenPointFinder::IsFive(int x, int y, int nColor) {
         nLine = 1;
         i = x;
         j = y + 2;
-        while ((i > 0) && (j < (BOARD_SIZE + 1))) {
-            if (cBoard[i--][j++] == WHITE_STONE)
+        while ((i > 0) && (j < (BoardSize + 1))) {
+            if (cBoard[i--][j++] == Stone::White)
                 nLine++;
             else
                 break;
         }
         i = x + 2;
         j = y;
-        while ((i < (BOARD_SIZE + 1)) && (j > 0)) {
-            if (cBoard[i++][j--] == WHITE_STONE)
+        while ((i < (BoardSize + 1)) && (j > 0)) {
+            if (cBoard[i++][j--] == Stone::White)
                 nLine++;
             else
                 break;
         }
         if (nLine >= 5) {
-            SetStone(x, y, EMPTY_STONE);
+            setStone(x, y, Stone::Empty);
             return true;
         }
 
-        SetStone(x, y, EMPTY_STONE);
+        setStone(x, y, Stone::Empty);
         return false;
     } else
         return false;
 }
 
-bool CForbiddenPointFinder::IsOverline(int x, int y) {
-    if (cBoard[x + 1][y + 1] != EMPTY_STONE)
+bool ForbiddenPointFinder::isOverline(int x, int y) {
+    if (cBoard[x + 1][y + 1] != Stone::Empty)
         return false;
 
-    SetStone(x, y, BLACK_STONE);
+    setStone(x, y, Stone::Black);
 
     // detect black overline
     int i, j;
@@ -281,20 +281,20 @@ bool CForbiddenPointFinder::IsOverline(int x, int y) {
     int nLine = 1;
     i = x;
     while (i > 0) {
-        if (cBoard[i--][y + 1] == BLACK_STONE)
+        if (cBoard[i--][y + 1] == Stone::Black)
             nLine++;
         else
             break;
     }
     i = x + 2;
-    while (i < (BOARD_SIZE + 1)) {
-        if (cBoard[i++][y + 1] == BLACK_STONE)
+    while (i < (BoardSize + 1)) {
+        if (cBoard[i++][y + 1] == Stone::Black)
             nLine++;
         else
             break;
     }
     if (nLine == 5) {
-        SetStone(x, y, EMPTY_STONE);
+        setStone(x, y, Stone::Empty);
         return false;
     } else
         bOverline |= (nLine >= 6);
@@ -303,20 +303,20 @@ bool CForbiddenPointFinder::IsOverline(int x, int y) {
     nLine = 1;
     i = y;
     while (i > 0) {
-        if (cBoard[x + 1][i--] == BLACK_STONE)
+        if (cBoard[x + 1][i--] == Stone::Black)
             nLine++;
         else
             break;
     }
     i = y + 2;
-    while (i < (BOARD_SIZE + 1)) {
-        if (cBoard[x + 1][i++] == BLACK_STONE)
+    while (i < (BoardSize + 1)) {
+        if (cBoard[x + 1][i++] == Stone::Black)
             nLine++;
         else
             break;
     }
     if (nLine == 5) {
-        SetStone(x, y, EMPTY_STONE);
+        setStone(x, y, Stone::Empty);
         return false;
     } else
         bOverline |= (nLine >= 6);
@@ -326,21 +326,21 @@ bool CForbiddenPointFinder::IsOverline(int x, int y) {
     i = x;
     j = y;
     while ((i > 0) && (j > 0)) {
-        if (cBoard[i--][j--] == BLACK_STONE)
+        if (cBoard[i--][j--] == Stone::Black)
             nLine++;
         else
             break;
     }
     i = x + 2;
     j = y + 2;
-    while ((i < (BOARD_SIZE + 1)) && (j < (BOARD_SIZE + 1))) {
-        if (cBoard[i++][j++] == BLACK_STONE)
+    while ((i < (BoardSize + 1)) && (j < (BoardSize + 1))) {
+        if (cBoard[i++][j++] == Stone::Black)
             nLine++;
         else
             break;
     }
     if (nLine == 5) {
-        SetStone(x, y, EMPTY_STONE);
+        setStone(x, y, Stone::Empty);
         return false;
     } else
         bOverline |= (nLine >= 6);
@@ -349,43 +349,43 @@ bool CForbiddenPointFinder::IsOverline(int x, int y) {
     nLine = 1;
     i = x;
     j = y + 2;
-    while ((i > 0) && (j < (BOARD_SIZE + 1))) {
-        if (cBoard[i--][j++] == BLACK_STONE)
+    while ((i > 0) && (j < (BoardSize + 1))) {
+        if (cBoard[i--][j++] == Stone::Black)
             nLine++;
         else
             break;
     }
     i = x + 2;
     j = y;
-    while ((i < (BOARD_SIZE + 1)) && (j > 0)) {
-        if (cBoard[i++][j--] == BLACK_STONE)
+    while ((i < (BoardSize + 1)) && (j > 0)) {
+        if (cBoard[i++][j--] == Stone::Black)
             nLine++;
         else
             break;
     }
     if (nLine == 5) {
-        SetStone(x, y, EMPTY_STONE);
+        setStone(x, y, Stone::Empty);
         return false;
     } else
         bOverline |= (nLine >= 6);
 
-    SetStone(x, y, EMPTY_STONE);
+    setStone(x, y, Stone::Empty);
     return bOverline;
 }
 
-bool CForbiddenPointFinder::IsFive(int x, int y, int nColor, int nDir) {
-    if (cBoard[x + 1][y + 1] != EMPTY_STONE)
+bool ForbiddenPointFinder::isFive(int x, int y, int nColor, int nDir) {
+    if (cBoard[x + 1][y + 1] != Stone::Empty)
         return false;
 
-    char c;
+    Stone c;
     if (nColor == 0)    // black
-        c = BLACK_STONE;
+        c = Stone::Black;
     else if (nColor == 1)    // white
-        c = WHITE_STONE;
+        c = Stone::White;
     else
         return false;
 
-    SetStone(x, y, c);
+    setStone(x, y, c);
 
     int i, j;
     int nLine;
@@ -401,17 +401,17 @@ bool CForbiddenPointFinder::IsFive(int x, int y, int nColor, int nDir) {
                     break;
             }
             i = x + 2;
-            while (i < (BOARD_SIZE + 1)) {
+            while (i < (BoardSize + 1)) {
                 if (cBoard[i++][y + 1] == c)
                     nLine++;
                 else
                     break;
             }
             if (nLine == 5) {
-                SetStone(x, y, EMPTY_STONE);
+                setStone(x, y, Stone::Empty);
                 return true;
             } else {
-                SetStone(x, y, EMPTY_STONE);
+                setStone(x, y, Stone::Empty);
                 return false;
             }
             break;
@@ -425,17 +425,17 @@ bool CForbiddenPointFinder::IsFive(int x, int y, int nColor, int nDir) {
                     break;
             }
             i = y + 2;
-            while (i < (BOARD_SIZE + 1)) {
+            while (i < (BoardSize + 1)) {
                 if (cBoard[x + 1][i++] == c)
                     nLine++;
                 else
                     break;
             }
             if (nLine == 5) {
-                SetStone(x, y, EMPTY_STONE);
+                setStone(x, y, Stone::Empty);
                 return true;
             } else {
-                SetStone(x, y, EMPTY_STONE);
+                setStone(x, y, Stone::Empty);
                 return false;
             }
             break;
@@ -451,17 +451,17 @@ bool CForbiddenPointFinder::IsFive(int x, int y, int nColor, int nDir) {
             }
             i = x + 2;
             j = y + 2;
-            while ((i < (BOARD_SIZE + 1)) && (j < (BOARD_SIZE + 1))) {
+            while ((i < (BoardSize + 1)) && (j < (BoardSize + 1))) {
                 if (cBoard[i++][j++] == c)
                     nLine++;
                 else
                     break;
             }
             if (nLine == 5) {
-                SetStone(x, y, EMPTY_STONE);
+                setStone(x, y, Stone::Empty);
                 return true;
             } else {
-                SetStone(x, y, EMPTY_STONE);
+                setStone(x, y, Stone::Empty);
                 return false;
             }
             break;
@@ -469,7 +469,7 @@ bool CForbiddenPointFinder::IsFive(int x, int y, int nColor, int nDir) {
             nLine = 1;
             i = x;
             j = y + 2;
-            while ((i > 0) && (j < (BOARD_SIZE + 1))) {
+            while ((i > 0) && (j < (BoardSize + 1))) {
                 if (cBoard[i--][j++] == c)
                     nLine++;
                 else
@@ -477,45 +477,45 @@ bool CForbiddenPointFinder::IsFive(int x, int y, int nColor, int nDir) {
             }
             i = x + 2;
             j = y;
-            while ((i < (BOARD_SIZE + 1)) && (j > 0)) {
+            while ((i < (BoardSize + 1)) && (j > 0)) {
                 if (cBoard[i++][j--] == c)
                     nLine++;
                 else
                     break;
             }
             if (nLine == 5) {
-                SetStone(x, y, EMPTY_STONE);
+                setStone(x, y, Stone::Empty);
                 return true;
             } else {
-                SetStone(x, y, EMPTY_STONE);
+                setStone(x, y, Stone::Empty);
                 return false;
             }
             break;
         default:
-            SetStone(x, y, EMPTY_STONE);
+            setStone(x, y, Stone::Empty);
             return false;
             break;
     }
 }
 
-bool CForbiddenPointFinder::IsFour(int x, int y, int nColor, int nDir) {
-    if (cBoard[x + 1][y + 1] != EMPTY_STONE)
+bool ForbiddenPointFinder::isFour(int x, int y, int nColor, int nDir) {
+    if (cBoard[x + 1][y + 1] != Stone::Empty)
         return false;
 
-    if (IsFive(x, y, nColor))    // five?
+    if (isFive(x, y, nColor))    // five?
         return false;
-    else if ((nColor == 0) && (IsOverline(x, y)))    // black overline?
+    else if ((nColor == 0) && (isOverline(x, y)))    // black overline?
         return false;
     else {
-        char c;
+        Stone c;
         if (nColor == 0)    // black
-            c = BLACK_STONE;
+            c = Stone::Black;
         else if (nColor == 1)    // white
-            c = WHITE_STONE;
+            c = Stone::White;
         else
             return false;
 
-        SetStone(x, y, c);
+        setStone(x, y, c);
 
         int i, j;
 
@@ -526,9 +526,9 @@ bool CForbiddenPointFinder::IsFour(int x, int y, int nColor, int nDir) {
                     if (cBoard[i][y + 1] == c) {
                         i--;
                         continue;
-                    } else if (cBoard[i][y + 1] == EMPTY_STONE) {
-                        if (IsFive(i - 1, y, 0, nDir)) {
-                            SetStone(x, y, EMPTY_STONE);
+                    } else if (cBoard[i][y + 1] == Stone::Empty) {
+                        if (isFive(i - 1, y, 0, nDir)) {
+                            setStone(x, y, Stone::Empty);
                             return true;
                         } else
                             break;
@@ -536,20 +536,20 @@ bool CForbiddenPointFinder::IsFour(int x, int y, int nColor, int nDir) {
                         break;
                 }
                 i = x + 2;
-                while (i < (BOARD_SIZE + 1)) {
+                while (i < (BoardSize + 1)) {
                     if (cBoard[i][y + 1] == c) {
                         i++;
                         continue;
-                    } else if (cBoard[i][y + 1] == EMPTY_STONE) {
-                        if (IsFive(i - 1, y, 0, nDir)) {
-                            SetStone(x, y, EMPTY_STONE);
+                    } else if (cBoard[i][y + 1] == Stone::Empty) {
+                        if (isFive(i - 1, y, 0, nDir)) {
+                            setStone(x, y, Stone::Empty);
                             return true;
                         } else
                             break;
                     } else
                         break;
                 }
-                SetStone(x, y, EMPTY_STONE);
+                setStone(x, y, Stone::Empty);
                 return false;
                 break;
             case 2:        // vertial direction
@@ -558,9 +558,9 @@ bool CForbiddenPointFinder::IsFour(int x, int y, int nColor, int nDir) {
                     if (cBoard[x + 1][i] == c) {
                         i--;
                         continue;
-                    } else if (cBoard[x + 1][i] == EMPTY_STONE) {
-                        if (IsFive(x, i - 1, 0, nDir)) {
-                            SetStone(x, y, EMPTY_STONE);
+                    } else if (cBoard[x + 1][i] == Stone::Empty) {
+                        if (isFive(x, i - 1, 0, nDir)) {
+                            setStone(x, y, Stone::Empty);
                             return true;
                         } else
                             break;
@@ -568,20 +568,20 @@ bool CForbiddenPointFinder::IsFour(int x, int y, int nColor, int nDir) {
                         break;
                 }
                 i = y + 2;
-                while (i < (BOARD_SIZE + 1)) {
+                while (i < (BoardSize + 1)) {
                     if (cBoard[x + 1][i] == c) {
                         i++;
                         continue;
-                    } else if (cBoard[x + 1][i] == EMPTY_STONE) {
-                        if (IsFive(x, i - 1, 0, nDir)) {
-                            SetStone(x, y, EMPTY_STONE);
+                    } else if (cBoard[x + 1][i] == Stone::Empty) {
+                        if (isFive(x, i - 1, 0, nDir)) {
+                            setStone(x, y, Stone::Empty);
                             return true;
                         } else
                             break;
                     } else
                         break;
                 }
-                SetStone(x, y, EMPTY_STONE);
+                setStone(x, y, Stone::Empty);
                 return false;
                 break;
             case 3:        // diagonal direction - '/'
@@ -592,9 +592,9 @@ bool CForbiddenPointFinder::IsFour(int x, int y, int nColor, int nDir) {
                         i--;
                         j--;
                         continue;
-                    } else if (cBoard[i][j] == EMPTY_STONE) {
-                        if (IsFive(i - 1, j - 1, 0, nDir)) {
-                            SetStone(x, y, EMPTY_STONE);
+                    } else if (cBoard[i][j] == Stone::Empty) {
+                        if (isFive(i - 1, j - 1, 0, nDir)) {
+                            setStone(x, y, Stone::Empty);
                             return true;
                         } else
                             break;
@@ -603,34 +603,34 @@ bool CForbiddenPointFinder::IsFour(int x, int y, int nColor, int nDir) {
                 }
                 i = x + 2;
                 j = y + 2;
-                while ((i < (BOARD_SIZE + 1)) && (j < (BOARD_SIZE + 1))) {
+                while ((i < (BoardSize + 1)) && (j < (BoardSize + 1))) {
                     if (cBoard[i][j] == c) {
                         i++;
                         j++;
                         continue;
-                    } else if (cBoard[i][j] == EMPTY_STONE) {
-                        if (IsFive(i - 1, j - 1, 0, nDir)) {
-                            SetStone(x, y, EMPTY_STONE);
+                    } else if (cBoard[i][j] == Stone::Empty) {
+                        if (isFive(i - 1, j - 1, 0, nDir)) {
+                            setStone(x, y, Stone::Empty);
                             return true;
                         } else
                             break;
                     } else
                         break;
                 }
-                SetStone(x, y, EMPTY_STONE);
+                setStone(x, y, Stone::Empty);
                 return false;
                 break;
             case 4:        // diagonal direction - '\'
                 i = x;
                 j = y + 2;
-                while ((i > 0) && (j < (BOARD_SIZE + 1))) {
+                while ((i > 0) && (j < (BoardSize + 1))) {
                     if (cBoard[i][j] == c) {
                         i--;
                         j++;
                         continue;
-                    } else if (cBoard[i][j] == EMPTY_STONE) {
-                        if (IsFive(i - 1, j - 1, 0, nDir)) {
-                            SetStone(x, y, EMPTY_STONE);
+                    } else if (cBoard[i][j] == Stone::Empty) {
+                        if (isFive(i - 1, j - 1, 0, nDir)) {
+                            setStone(x, y, Stone::Empty);
                             return true;
                         } else
                             break;
@@ -639,49 +639,49 @@ bool CForbiddenPointFinder::IsFour(int x, int y, int nColor, int nDir) {
                 }
                 i = x + 2;
                 j = y;
-                while ((i < (BOARD_SIZE + 1)) && (j > 0)) {
+                while ((i < (BoardSize + 1)) && (j > 0)) {
                     if (cBoard[i][j] == c) {
                         i++;
                         j--;
                         continue;
-                    } else if (cBoard[i][j] == EMPTY_STONE) {
-                        if (IsFive(i - 1, j - 1, 0, nDir)) {
-                            SetStone(x, y, EMPTY_STONE);
+                    } else if (cBoard[i][j] == Stone::Empty) {
+                        if (isFive(i - 1, j - 1, 0, nDir)) {
+                            setStone(x, y, Stone::Empty);
                             return true;
                         } else
                             break;
                     } else
                         break;
                 }
-                SetStone(x, y, EMPTY_STONE);
+                setStone(x, y, Stone::Empty);
                 return false;
                 break;
             default:
-                SetStone(x, y, EMPTY_STONE);
+                setStone(x, y, Stone::Empty);
                 return false;
                 break;
         }
     }
 }
 
-int CForbiddenPointFinder::IsOpenFour(int x, int y, int nColor, int nDir) {
-    if (cBoard[x + 1][y + 1] != EMPTY_STONE)
+int ForbiddenPointFinder::isOpenFour(int x, int y, int nColor, int nDir) {
+    if (cBoard[x + 1][y + 1] != Stone::Empty)
         return 0;
 
-    if (IsFive(x, y, nColor))    // five?
+    if (isFive(x, y, nColor))    // five?
         return 0;
-    else if ((nColor == 0) && (IsOverline(x, y)))    // black overline?
+    else if ((nColor == 0) && (isOverline(x, y)))    // black overline?
         return 0;
     else {
-        char c;
+        Stone c;
         if (nColor == 0)    // black
-            c = BLACK_STONE;
+            c = Stone::Black;
         else if (nColor == 1)    // white
-            c = WHITE_STONE;
+            c = Stone::White;
         else
             return 0;
 
-        SetStone(x, y, c);
+        setStone(x, y, c);
 
         int i, j;
         int nLine;
@@ -695,33 +695,33 @@ int CForbiddenPointFinder::IsOpenFour(int x, int y, int nColor, int nDir) {
                         i--;
                         nLine++;
                         continue;
-                    } else if (cBoard[i][y + 1] == EMPTY_STONE) {
-                        if (!IsFive(i - 1, y, 0, nDir)) {
-                            SetStone(x, y, EMPTY_STONE);
+                    } else if (cBoard[i][y + 1] == Stone::Empty) {
+                        if (!isFive(i - 1, y, 0, nDir)) {
+                            setStone(x, y, Stone::Empty);
                             return 0;
                         } else
                             break;
                     } else {
-                        SetStone(x, y, EMPTY_STONE);
+                        setStone(x, y, Stone::Empty);
                         return 0;
                     }
                 }
                 i = x + 2;
-                while (i < (BOARD_SIZE + 1)) {
+                while (i < (BoardSize + 1)) {
                     if (cBoard[i][y + 1] == c) {
                         i++;
                         nLine++;
                         continue;
-                    } else if (cBoard[i][y + 1] == EMPTY_STONE) {
-                        if (IsFive(i - 1, y, 0, nDir)) {
-                            SetStone(x, y, EMPTY_STONE);
+                    } else if (cBoard[i][y + 1] == Stone::Empty) {
+                        if (isFive(i - 1, y, 0, nDir)) {
+                            setStone(x, y, Stone::Empty);
                             return (nLine == 4 ? 1 : 2);
                         } else
                             break;
                     } else
                         break;
                 }
-                SetStone(x, y, EMPTY_STONE);
+                setStone(x, y, Stone::Empty);
                 return 0;
                 break;
             case 2:        // vertial direction
@@ -732,33 +732,33 @@ int CForbiddenPointFinder::IsOpenFour(int x, int y, int nColor, int nDir) {
                         i--;
                         nLine++;
                         continue;
-                    } else if (cBoard[x + 1][i] == EMPTY_STONE) {
-                        if (!IsFive(x, i - 1, 0, nDir)) {
-                            SetStone(x, y, EMPTY_STONE);
+                    } else if (cBoard[x + 1][i] == Stone::Empty) {
+                        if (!isFive(x, i - 1, 0, nDir)) {
+                            setStone(x, y, Stone::Empty);
                             return 0;
                         } else
                             break;
                     } else {
-                        SetStone(x, y, EMPTY_STONE);
+                        setStone(x, y, Stone::Empty);
                         return 0;
                     }
                 }
                 i = y + 2;
-                while (i < (BOARD_SIZE + 1)) {
+                while (i < (BoardSize + 1)) {
                     if (cBoard[x + 1][i] == c) {
                         i++;
                         nLine++;
                         continue;
-                    } else if (cBoard[x + 1][i] == EMPTY_STONE) {
-                        if (IsFive(x, i - 1, 0, nDir)) {
-                            SetStone(x, y, EMPTY_STONE);
+                    } else if (cBoard[x + 1][i] == Stone::Empty) {
+                        if (isFive(x, i - 1, 0, nDir)) {
+                            setStone(x, y, Stone::Empty);
                             return (nLine == 4 ? 1 : 2);
                         } else
                             break;
                     } else
                         break;
                 }
-                SetStone(x, y, EMPTY_STONE);
+                setStone(x, y, Stone::Empty);
                 return 0;
                 break;
             case 3:        // diagonal direction - '/'
@@ -771,98 +771,98 @@ int CForbiddenPointFinder::IsOpenFour(int x, int y, int nColor, int nDir) {
                         j--;
                         nLine++;
                         continue;
-                    } else if (cBoard[i][j] == EMPTY_STONE) {
-                        if (!IsFive(i - 1, j - 1, 0, nDir)) {
-                            SetStone(x, y, EMPTY_STONE);
+                    } else if (cBoard[i][j] == Stone::Empty) {
+                        if (!isFive(i - 1, j - 1, 0, nDir)) {
+                            setStone(x, y, Stone::Empty);
                             return 0;
                         } else
                             break;
                     } else {
-                        SetStone(x, y, EMPTY_STONE);
+                        setStone(x, y, Stone::Empty);
                         return 0;
                     }
                 }
                 i = x + 2;
                 j = y + 2;
-                while ((i < (BOARD_SIZE + 1)) && (j < (BOARD_SIZE + 1))) {
+                while ((i < (BoardSize + 1)) && (j < (BoardSize + 1))) {
                     if (cBoard[i][j] == c) {
                         i++;
                         j++;
                         nLine++;
                         continue;
-                    } else if (cBoard[i][j] == EMPTY_STONE) {
-                        if (IsFive(i - 1, j - 1, 0, nDir)) {
-                            SetStone(x, y, EMPTY_STONE);
+                    } else if (cBoard[i][j] == Stone::Empty) {
+                        if (isFive(i - 1, j - 1, 0, nDir)) {
+                            setStone(x, y, Stone::Empty);
                             return (nLine == 4 ? 1 : 2);
                         } else
                             break;
                     } else
                         break;
                 }
-                SetStone(x, y, EMPTY_STONE);
+                setStone(x, y, Stone::Empty);
                 return 0;
                 break;
             case 4:        // diagonal direction - '\'
                 nLine = 1;
                 i = x;
                 j = y + 2;
-                while ((i >= 0) && (j <= (BOARD_SIZE + 1))) {
+                while ((i >= 0) && (j <= (BoardSize + 1))) {
                     if (cBoard[i][j] == c) {
                         i--;
                         j++;
                         nLine++;
                         continue;
-                    } else if (cBoard[i][j] == EMPTY_STONE) {
-                        if (!IsFive(i - 1, j - 1, 0, nDir)) {
-                            SetStone(x, y, EMPTY_STONE);
+                    } else if (cBoard[i][j] == Stone::Empty) {
+                        if (!isFive(i - 1, j - 1, 0, nDir)) {
+                            setStone(x, y, Stone::Empty);
                             return 0;
                         } else
                             break;
                     } else {
-                        SetStone(x, y, EMPTY_STONE);
+                        setStone(x, y, Stone::Empty);
                         return 0;
                     }
                 }
                 i = x + 2;
                 j = y;
-                while ((i < (BOARD_SIZE + 1)) && (j > 0)) {
+                while ((i < (BoardSize + 1)) && (j > 0)) {
                     if (cBoard[i][j] == c) {
                         i++;
                         j--;
                         nLine++;
                         continue;
-                    } else if (cBoard[i][j] == EMPTY_STONE) {
-                        if (IsFive(i - 1, j - 1, 0, nDir)) {
-                            SetStone(x, y, EMPTY_STONE);
+                    } else if (cBoard[i][j] == Stone::Empty) {
+                        if (isFive(i - 1, j - 1, 0, nDir)) {
+                            setStone(x, y, Stone::Empty);
                             return (nLine == 4 ? 1 : 2);
                         } else
                             break;
                     } else
                         break;
                 }
-                SetStone(x, y, EMPTY_STONE);
+                setStone(x, y, Stone::Empty);
                 return 0;
                 break;
             default:
-                SetStone(x, y, EMPTY_STONE);
+                setStone(x, y, Stone::Empty);
                 return 0;
                 break;
         }
     }
 }
 
-bool CForbiddenPointFinder::IsDoubleFour(int x, int y) {
-    if (cBoard[x + 1][y + 1] != EMPTY_STONE)
+bool ForbiddenPointFinder::isDoubleFour(int x, int y) {
+    if (cBoard[x + 1][y + 1] != Stone::Empty)
         return false;
 
-    if (IsFive(x, y, 0))    // five?
+    if (isFive(x, y, 0))    // five?
         return false;
 
     int nFour = 0;
     for (int i = 1; i <= 4; i++) {
-        if (IsOpenFour(x, y, 0, i) == 2)
+        if (isOpenFour(x, y, 0, i) == 2)
             nFour += 2;
-        else if (IsFour(x, y, 0, i))
+        else if (isFour(x, y, 0, i))
             nFour++;
     }
 
@@ -872,21 +872,21 @@ bool CForbiddenPointFinder::IsDoubleFour(int x, int y) {
         return false;
 }
 
-bool CForbiddenPointFinder::IsOpenThree(int x, int y, int nColor, int nDir) {
-    if (IsFive(x, y, nColor))    // five?
+bool ForbiddenPointFinder::isOpenThree(int x, int y, int nColor, int nDir) {
+    if (isFive(x, y, nColor))    // five?
         return false;
-    else if ((nColor == 0) && (IsOverline(x, y)))    // black overline?
+    else if ((nColor == 0) && (isOverline(x, y)))    // black overline?
         return false;
     else {
-        char c;
+        Stone c;
         if (nColor == 0)    // black
-            c = BLACK_STONE;
+            c = Stone::Black;
         else if (nColor == 1)    // white
-            c = WHITE_STONE;
+            c = Stone::White;
         else
             return false;
 
-        SetStone(x, y, c);
+        setStone(x, y, c);
 
         int i, j;
 
@@ -897,10 +897,10 @@ bool CForbiddenPointFinder::IsOpenThree(int x, int y, int nColor, int nDir) {
                     if (cBoard[i][y + 1] == c) {
                         i--;
                         continue;
-                    } else if (cBoard[i][y + 1] == EMPTY_STONE) {
-                        if ((IsOpenFour(i - 1, y, nColor, nDir) == 1) && (!IsDoubleFour(i - 1, y)) &&
-                            (!IsDoubleThree(i - 1, y))) {
-                            SetStone(x, y, EMPTY_STONE);
+                    } else if (cBoard[i][y + 1] == Stone::Empty) {
+                        if ((isOpenFour(i - 1, y, nColor, nDir) == 1) && (!isDoubleFour(i - 1, y)) &&
+                            (!isDoubleThree(i - 1, y))) {
+                            setStone(x, y, Stone::Empty);
                             return true;
                         } else
                             break;
@@ -908,21 +908,21 @@ bool CForbiddenPointFinder::IsOpenThree(int x, int y, int nColor, int nDir) {
                         break;
                 }
                 i = x + 2;
-                while (i < (BOARD_SIZE + 1)) {
+                while (i < (BoardSize + 1)) {
                     if (cBoard[i][y + 1] == c) {
                         i++;
                         continue;
-                    } else if (cBoard[i][y + 1] == EMPTY_STONE) {
-                        if ((IsOpenFour(i - 1, y, nColor, nDir) == 1) && (!IsDoubleFour(i - 1, y)) &&
-                            (!IsDoubleThree(i - 1, y))) {
-                            SetStone(x, y, EMPTY_STONE);
+                    } else if (cBoard[i][y + 1] == Stone::Empty) {
+                        if ((isOpenFour(i - 1, y, nColor, nDir) == 1) && (!isDoubleFour(i - 1, y)) &&
+                            (!isDoubleThree(i - 1, y))) {
+                            setStone(x, y, Stone::Empty);
                             return true;
                         } else
                             break;
                     } else
                         break;
                 }
-                SetStone(x, y, EMPTY_STONE);
+                setStone(x, y, Stone::Empty);
                 return false;
                 break;
             case 2:        // vertial direction
@@ -931,10 +931,10 @@ bool CForbiddenPointFinder::IsOpenThree(int x, int y, int nColor, int nDir) {
                     if (cBoard[x + 1][i] == c) {
                         i--;
                         continue;
-                    } else if (cBoard[x + 1][i] == EMPTY_STONE) {
-                        if ((IsOpenFour(x, i - 1, nColor, nDir) == 1) && (!IsDoubleFour(x, i - 1)) &&
-                            (!IsDoubleThree(x, i - 1))) {
-                            SetStone(x, y, EMPTY_STONE);
+                    } else if (cBoard[x + 1][i] == Stone::Empty) {
+                        if ((isOpenFour(x, i - 1, nColor, nDir) == 1) && (!isDoubleFour(x, i - 1)) &&
+                            (!isDoubleThree(x, i - 1))) {
+                            setStone(x, y, Stone::Empty);
                             return true;
                         } else
                             break;
@@ -942,21 +942,21 @@ bool CForbiddenPointFinder::IsOpenThree(int x, int y, int nColor, int nDir) {
                         break;
                 }
                 i = y + 2;
-                while (i < (BOARD_SIZE + 1)) {
+                while (i < (BoardSize + 1)) {
                     if (cBoard[x + 1][i] == c) {
                         i++;
                         continue;
-                    } else if (cBoard[x + 1][i] == EMPTY_STONE) {
-                        if ((IsOpenFour(x, i - 1, nColor, nDir) == 1) && (!IsDoubleFour(x, i - 1)) &&
-                            (!IsDoubleThree(x, i - 1))) {
-                            SetStone(x, y, EMPTY_STONE);
+                    } else if (cBoard[x + 1][i] == Stone::Empty) {
+                        if ((isOpenFour(x, i - 1, nColor, nDir) == 1) && (!isDoubleFour(x, i - 1)) &&
+                            (!isDoubleThree(x, i - 1))) {
+                            setStone(x, y, Stone::Empty);
                             return true;
                         } else
                             break;
                     } else
                         break;
                 }
-                SetStone(x, y, EMPTY_STONE);
+                setStone(x, y, Stone::Empty);
                 return false;
                 break;
             case 3:        // diagonal direction - '/'
@@ -967,10 +967,10 @@ bool CForbiddenPointFinder::IsOpenThree(int x, int y, int nColor, int nDir) {
                         i--;
                         j--;
                         continue;
-                    } else if (cBoard[i][j] == EMPTY_STONE) {
-                        if ((IsOpenFour(i - 1, j - 1, nColor, nDir) == 1) && (!IsDoubleFour(i - 1, j - 1)) &&
-                            (!IsDoubleThree(i - 1, j - 1))) {
-                            SetStone(x, y, EMPTY_STONE);
+                    } else if (cBoard[i][j] == Stone::Empty) {
+                        if ((isOpenFour(i - 1, j - 1, nColor, nDir) == 1) && (!isDoubleFour(i - 1, j - 1)) &&
+                            (!isDoubleThree(i - 1, j - 1))) {
+                            setStone(x, y, Stone::Empty);
                             return true;
                         } else
                             break;
@@ -979,36 +979,36 @@ bool CForbiddenPointFinder::IsOpenThree(int x, int y, int nColor, int nDir) {
                 }
                 i = x + 2;
                 j = y + 2;
-                while ((i < (BOARD_SIZE + 1)) && (j < (BOARD_SIZE + 1))) {
+                while ((i < (BoardSize + 1)) && (j < (BoardSize + 1))) {
                     if (cBoard[i][j] == c) {
                         i++;
                         j++;
                         continue;
-                    } else if (cBoard[i][j] == EMPTY_STONE) {
-                        if ((IsOpenFour(i - 1, j - 1, nColor, nDir) == 1) && (!IsDoubleFour(i - 1, j - 1)) &&
-                            (!IsDoubleThree(i - 1, j - 1))) {
-                            SetStone(x, y, EMPTY_STONE);
+                    } else if (cBoard[i][j] == Stone::Empty) {
+                        if ((isOpenFour(i - 1, j - 1, nColor, nDir) == 1) && (!isDoubleFour(i - 1, j - 1)) &&
+                            (!isDoubleThree(i - 1, j - 1))) {
+                            setStone(x, y, Stone::Empty);
                             return true;
                         } else
                             break;
                     } else
                         break;
                 }
-                SetStone(x, y, EMPTY_STONE);
+                setStone(x, y, Stone::Empty);
                 return false;
                 break;
             case 4:        // diagonal direction - '\'
                 i = x;
                 j = y + 2;
-                while ((i > 0) && (j < (BOARD_SIZE + 1))) {
+                while ((i > 0) && (j < (BoardSize + 1))) {
                     if (cBoard[i][j] == c) {
                         i--;
                         j++;
                         continue;
-                    } else if (cBoard[i][j] == EMPTY_STONE) {
-                        if ((IsOpenFour(i - 1, j - 1, nColor, nDir) == 1) && (!IsDoubleFour(i - 1, j - 1)) &&
-                            (!IsDoubleThree(i - 1, j - 1))) {
-                            SetStone(x, y, EMPTY_STONE);
+                    } else if (cBoard[i][j] == Stone::Empty) {
+                        if ((isOpenFour(i - 1, j - 1, nColor, nDir) == 1) && (!isDoubleFour(i - 1, j - 1)) &&
+                            (!isDoubleThree(i - 1, j - 1))) {
+                            setStone(x, y, Stone::Empty);
                             return true;
                         } else
                             break;
@@ -1017,42 +1017,42 @@ bool CForbiddenPointFinder::IsOpenThree(int x, int y, int nColor, int nDir) {
                 }
                 i = x + 2;
                 j = y;
-                while ((i < (BOARD_SIZE + 1)) && (j > 0)) {
+                while ((i < (BoardSize + 1)) && (j > 0)) {
                     if (cBoard[i][j] == c) {
                         i++;
                         j--;
                         continue;
-                    } else if (cBoard[i][j] == EMPTY_STONE) {
-                        if ((IsOpenFour(i - 1, j - 1, nColor, nDir) == 1) && (!IsDoubleFour(i - 1, j - 1)) &&
-                            (!IsDoubleThree(i - 1, j - 1))) {
-                            SetStone(x, y, EMPTY_STONE);
+                    } else if (cBoard[i][j] == Stone::Empty) {
+                        if ((isOpenFour(i - 1, j - 1, nColor, nDir) == 1) && (!isDoubleFour(i - 1, j - 1)) &&
+                            (!isDoubleThree(i - 1, j - 1))) {
+                            setStone(x, y, Stone::Empty);
                             return true;
                         } else
                             break;
                     } else
                         break;
                 }
-                SetStone(x, y, EMPTY_STONE);
+                setStone(x, y, Stone::Empty);
                 return false;
                 break;
             default:
-                SetStone(x, y, EMPTY_STONE);
+                setStone(x, y, Stone::Empty);
                 return false;
                 break;
         }
     }
 }
 
-bool CForbiddenPointFinder::IsDoubleThree(int x, int y) {
-    if (cBoard[x + 1][y + 1] != EMPTY_STONE)
+bool ForbiddenPointFinder::isDoubleThree(int x, int y) {
+    if (cBoard[x + 1][y + 1] != Stone::Empty)
         return false;
 
-    if (IsFive(x, y, 0))    // five?
+    if (isFive(x, y, 0))    // five?
         return false;
 
     int nThree = 0;
     for (int i = 1; i <= 4; i++) {
-        if (IsOpenThree(x, y, 0, i))
+        if (isOpenThree(x, y, 0, i))
             nThree++;
     }
 
@@ -1062,14 +1062,14 @@ bool CForbiddenPointFinder::IsDoubleThree(int x, int y) {
         return false;
 }
 
-void CForbiddenPointFinder::FindForbiddenPoints() {
+void ForbiddenPointFinder::findForbiddenPoints() {
     nForbiddenPoints = 0;
-    for (int i = 0; i < BOARD_SIZE; i++) {
-        for (int j = 0; j < BOARD_SIZE; j++) {
-            if (cBoard[i + 1][j + 1] != EMPTY_STONE)
+    for (int i = 0; i < BoardSize; i++) {
+        for (int j = 0; j < BoardSize; j++) {
+            if (cBoard[i + 1][j + 1] != Stone::Empty)
                 continue;
             else {
-                if (IsOverline(i, j) || IsDoubleFour(i, j) || IsDoubleThree(i, j)) {
+                if (isOverline(i, j) || isDoubleFour(i, j) || isDoubleThree(i, j)) {
                     ptForbidden[nForbiddenPoints].x = i;
                     ptForbidden[nForbiddenPoints].y = j;
                     nForbiddenPoints++;

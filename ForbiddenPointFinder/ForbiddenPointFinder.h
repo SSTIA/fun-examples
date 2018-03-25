@@ -1,43 +1,64 @@
 #ifndef FORBIDDEN_POINT_FINDER_H
 #define FORBIDDEN_POINT_FINDER_H
 
+#ifndef _MSC_VER
 #include "CPoint.h"
+#endif
 
-#define BOARD_SIZE 15
-#define BLACK_STONE 'X'
-#define WHITE_STONE 'O'
-#define EMPTY_STONE '.'
-#define BLACK_FIVE 0
-#define WHITE_FIVE 1
-#define BLACK_FORBIDDEN 2
-
-class CForbiddenPointFinder {
+class ForbiddenPointFinder {
 public:
-    int nForbiddenPoints;
-    CPoint ptForbidden[BOARD_SIZE * BOARD_SIZE];
+    // standard renju / gomoku have 15 x 15 board
+    static const int BoardSize = 15;
+
+    enum class Stone {
+        Black = 'X',
+        White = 'O',
+        Empty = '.',
+        Wall = '$'
+    };
+
+    enum class Result {
+        BlackWin = 0,
+        WhiteWin = 1,
+        Forbidden = 2,
+        UNKNOWN = -1
+    };
+
+    int nForbiddenPoints = 0;
+    CPoint ptForbidden[BoardSize * BoardSize] = {};
 
 private:
-    char cBoard[BOARD_SIZE + 2][BOARD_SIZE + 2];
+    Stone cBoard[BoardSize + 2][BoardSize + 2];
 
 public:
-    CForbiddenPointFinder();
-    virtual ~CForbiddenPointFinder();
+    ForbiddenPointFinder();
 
-    void Clear();
-    int AddStone(int x, int y, char cStone);
+    virtual ~ForbiddenPointFinder();
+
+    void clear();
+
+    Result addStone(int x, int y, Stone cStone);
 
 private:
-    void SetStone(int x, int y, char cStone);
-    bool IsFive(int x, int y, int nColor);
-    bool IsOverline(int x, int y);
-    bool IsFive(int x, int y, int nColor, int nDir);
-    bool IsFour(int x, int y, int nColor, int nDir);
-    int IsOpenFour(int x, int y, int nColor, int nDir);
-    bool IsOpenThree(int x, int y, int nColor, int nDir);
-    bool IsDoubleFour(int x, int y);
-    bool IsDoubleThree(int x, int y);
+    void setStone(int x, int y, Stone cStone);
 
-    void FindForbiddenPoints();
+    bool isFive(int x, int y, int nColor);
+
+    bool isOverline(int x, int y);
+
+    bool isFive(int x, int y, int nColor, int nDir);
+
+    bool isFour(int x, int y, int nColor, int nDir);
+
+    int isOpenFour(int x, int y, int nColor, int nDir);
+
+    bool isOpenThree(int x, int y, int nColor, int nDir);
+
+    bool isDoubleFour(int x, int y);
+
+    bool isDoubleThree(int x, int y);
+
+    void findForbiddenPoints();
 };
 
 #endif // FORBIDDEN_POINT_FINDER_H

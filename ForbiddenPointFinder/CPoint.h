@@ -1,5 +1,5 @@
 //
-// Created by liu on 18-3-8.
+// Created by tc-imba on 18-3-8.
 //
 
 #ifndef CPOINT_H
