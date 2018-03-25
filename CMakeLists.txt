@@ -3,6 +3,7 @@ project(fun_examples)
 
 add_subdirectory(c)
 add_subdirectory(c_error)
+add_subdirectory(c_tester)
 add_subdirectory(cpp)
 add_subdirectory(cpp_naive)
 add_subdirectory(cpp_random)
