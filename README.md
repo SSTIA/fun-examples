@@ -2,8 +2,6 @@
 
 Some very simple Gomoku AIs, written by someone naive
 
-Do a little small work like [this](https://github.com/songqun/CPU-verilog)
-
 ## Examples
 
 + c: a startup AI template written in C
